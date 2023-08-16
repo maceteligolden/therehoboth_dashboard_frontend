@@ -213,7 +213,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders, refetch }
                         }}
                         color="inherit"
                         size="small"
-                        onClick={() =>handleBlogDelete(cryptoOrder._id)}
+                        onClick={() =>{}}
                       >
                         <DeleteTwoToneIcon fontSize="small" />
                       </IconButton>

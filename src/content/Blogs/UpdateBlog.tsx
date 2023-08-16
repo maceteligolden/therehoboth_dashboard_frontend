@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import * as yup from 'yup';
 
 interface IUpdateBlog {
-    blogId: string;
+    blogId: string | string[];
 }
 
 export default function UpdateBlog(props: IUpdateBlog) {

@@ -13,7 +13,7 @@ export const blogEndpoint = listApi.injectEndpoints({
                 body,
             }),
         }),
-        updateBlog: build.mutation<IResponseBase<Blog>, {id: string, body: Blog}>({
+        updateBlog: build.mutation<IResponseBase<Blog>, {id: string| string[], body: Blog}>({
             query: ({id, body}) => ({
                 url: `${baseUrl}/${id}`,
                 method: "PATCH",
@@ -29,7 +29,7 @@ export const blogEndpoint = listApi.injectEndpoints({
         getBlogs: build.query <IResponseBase<Blog[]>, void>({
             query: () => `${baseUrl}`,
         }),
-        getBlog: build.query <IResponseBase<Blog>, {id: string}>({
+        getBlog: build.query <IResponseBase<Blog>, {id: string | string[]}>({
             query: ({id}) => `${baseUrl}/${id}`,
         })
     }),
