@@ -1,10 +1,10 @@
+import { useAppSelector } from '@/lib/hooks';
+import { User, selectCurrentUser } from '@/lib/slice/authslice';
 import { Typography,  Grid } from '@mui/material';
 
 function PageHeader() {
-  const user = {
-    name: 'Catherine Pike',
-    avatar: '/static/images/avatars/1.jpg'
-  };
+
+  const user: User = useAppSelector(selectCurrentUser);
 
   return (
     <Grid container alignItems="center">
@@ -22,7 +22,7 @@ function PageHeader() {
       </Grid>
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-          Welcome, {user.name}!
+          Welcome, {user.firstname} {user.lastname}!
         </Typography>
         <Typography variant="subtitle2">
           Today is a good day to start writing new blog posts

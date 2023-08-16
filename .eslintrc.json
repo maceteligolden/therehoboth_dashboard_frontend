@@ -7,7 +7,7 @@
     "react/display-name": "off",
     "eslint-disable-next-line": "off",
     "react-hooks/exhaustive-deps": "off",
-    "react/no-unescaped-entities": "off",
+    "react/no-unescaped-entities": "warn",
     "react/jsx-max-props-per-line": [
       1,
       {
