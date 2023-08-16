@@ -36,6 +36,7 @@ import { useDeleteBlogMutation } from '@/services/blog.service';
 interface RecentOrdersTableProps {
   className?: string;
   cryptoOrders: Blog[];
+  refetch: () => void;
 }
 
 interface Filters {
@@ -82,7 +83,7 @@ const applyPagination = (
   return cryptoOrders.slice(page * limit, page * limit + limit);
 };
 
-const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
+const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders, refetch }) => {
   const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>(
     []
   );
@@ -92,18 +93,6 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
-
-  const [ deleteBlog, { isLoading }] = useDeleteBlogMutation();
-
-  const handleBlogDelete = (id: string) => {
-    deleteBlog({
-      id
-    }).then((res: any)=>{
-      console.log('response ' + res)
-    }).catch((err: any)=> {
-      console.log('error ' + err.message)
-    })
-  }
 
   const handleSelectAllCryptoOrders = (
     event: ChangeEvent<HTMLInputElement>

@@ -1,19 +1,20 @@
-import Head from 'next/head';
-import SidebarLayout from '@/layouts/SidebarLayout';
-import PageTitleWrapper from '@/components/PageTitleWrapper';
-import { Grid, Container, Card, TextField, Button } from '@mui/material';
-import Footer from '@/components/Footer';
-import { useCreateBlogMutation } from '@/services/blog.service';
-import { useFormik } from 'formik';
+import Toast, { IHandleMotion } from "@/components/Toast";
+import { useUpdateBlogMutation, useGetBlogsQuery, useGetBlogQuery } from "@/services/blog.service";
+import Blog from "@/services/dto/blog";
+import { Grid, Card, TextField, Button } from "@mui/material";
+import { useFormik } from "formik";
+import { useRouter } from "next/router";
+import { useState, useEffect } from "react";
 import * as yup from 'yup';
-import Blog from '@/services/dto/blog';
-import Toast, { IHandleMotion } from '@/components/Toast';
-import { useState } from 'react';
-import { Router, useRouter } from 'next/router';
 
-function CreateBlog() {
+interface IUpdateBlog {
+    blogId: string;
+}
 
-  const router = useRouter();
+export default function UpdateBlog(props: IUpdateBlog) {
+    const router = useRouter();
+
+  const [ loader, setLoader ] = useState<boolean>(true);
 
   const [successToastStatus, setSuccessToastStatus] = useState<IHandleMotion>({
     message: "",
@@ -34,7 +35,10 @@ function CreateBlog() {
     setErrorToastStatus(args);
   };
 
-  const [ createBlog, { isLoading }] = useCreateBlogMutation();
+  const [ updateBlog, { isLoading }] = useUpdateBlogMutation();
+
+  const { data, isSuccess } = useGetBlogQuery({ id: props.blogId });
+  
 
   const validationSchema = yup.object({
     title: yup
@@ -52,11 +56,13 @@ const formik = useFormik({
     },
     validationSchema: validationSchema,
     onSubmit: (values: Blog) => { 
-      createBlog({
-        title: values.title,
-        content: values.content
+      updateBlog({
+        id: props.blogId,
+        body: {
+            title: values.title,
+            content: values.content
+        }
       }).then((res: any)=> {
-        console.log(res.data.status)
         if (res.data.status === "success") {
           setTimeout(()=> {
             router.push('/blogs');
@@ -85,23 +91,17 @@ const formik = useFormik({
     },
 });
 
-  return (
-    <>
-      <Head>
-        <title>Therehoboth - Create Blogs</title>
-      </Head>
-      <PageTitleWrapper>
-        
-      </PageTitleWrapper>
-      <Container maxWidth="lg">
-        <Grid
-          container
-          direction="row"
-          justifyContent="center"
-          alignItems="stretch"
-          spacing={3}
-        >
-          <Grid item xs={12}>
+useEffect(()=>{
+    if(isSuccess) {
+        formik.setValues({
+            title: data.data.title,
+            content: data.data.content
+        })
+    }
+},[isSuccess])
+    return(
+        <>
+            <Grid item xs={12}>
             <Card sx={{ padding: '20px', display: 'flex', flexDirection:'column', gap: '10px'}}>
               <TextField 
                 id="outlined-basic" 
@@ -131,40 +131,31 @@ const formik = useFormik({
                 onClick={() => formik.handleSubmit()}
                 disabled={isLoading}
               >
-                Create Blog
+                Update Blog
               </Button>
             </Card>
+            <Toast
+                message={successToastStatus.message}
+                severity={"success"}
+                status={successToastStatus.visibility}
+                handler={function (): void {
+                    setSuccessToastStatus({
+                    visibility: false,
+                    });
+                }}
+            />
+
+            <Toast
+                message={errorToastStatus.message}
+                severity={"error"}
+                status={errorToastStatus.visibility}
+                handler={function (): void {
+                    setErrorToastStatus({
+                    visibility: false,
+                    });
+                }}
+            />
           </Grid>
-        </Grid>
-      </Container>
-      <Footer />
-      <Toast
-          message={successToastStatus.message}
-          severity={"success"}
-          status={successToastStatus.visibility}
-          handler={function (): void {
-              setSuccessToastStatus({
-              visibility: false,
-              });
-          }}
-      />
-
-      <Toast
-          message={errorToastStatus.message}
-          severity={"error"}
-          status={errorToastStatus.visibility}
-          handler={function (): void {
-              setErrorToastStatus({
-              visibility: false,
-              });
-          }}
-      />
-    </>
-  );
+        </>
+    )
 }
-
-CreateBlog.getLayout = (page) => (
-  <SidebarLayout>{page}</SidebarLayout>
-);
-
-export default CreateBlog;

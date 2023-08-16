@@ -17,7 +17,7 @@ export default function Toast(props: IToast) {
     return (
         <>
             <Snackbar
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 open={props.status}
                 autoHideDuration={2000}
                 onClose={props.handler}

@@ -37,6 +37,8 @@ export const blogEndpoint = listApi.injectEndpoints({
 
 export const {
    useGetBlogsQuery,
+   useGetBlogQuery,
    useDeleteBlogMutation,
+   useUpdateBlogMutation,
    useCreateBlogMutation
 } = blogEndpoint;
