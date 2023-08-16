@@ -32,7 +32,7 @@ const slice = createSlice({
       state.token = action.payload.token;
       state.user = action.payload.user;
     },
-    logOut: (state, action) => {
+    logOut: (state) => {
       state.token = '';
       state.user = defaultUser;
     }

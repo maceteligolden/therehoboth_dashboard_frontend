@@ -31,7 +31,7 @@ function CreateBlog() {
     setErrorToastStatus(args);
   };
 
-  const [ createBlog, { isLoading, isSuccess }] = useCreateBlogMutation();
+  const [ createBlog, { isLoading }] = useCreateBlogMutation();
 
   const validationSchema = yup.object({
     title: yup
@@ -67,7 +67,7 @@ const formik = useFormik({
             status: false,
           });
         }
-      }).catch((err: any)=>{
+      }).catch(()=>{
         errorToastHandler({
           message: "server error",
           visibility: true,

@@ -1,13 +1,9 @@
 import { FC, ChangeEvent, useState } from 'react';
-import { format } from 'date-fns';
-import numeral from 'numeral';
 import PropTypes from 'prop-types';
 import {
   Tooltip,
   Divider,
   Box,
-  FormControl,
-  InputLabel,
   Card,
   Checkbox,
   IconButton,
@@ -18,15 +14,8 @@ import {
   TablePagination,
   TableRow,
   TableContainer,
-  Select,
-  MenuItem,
-  Typography,
   useTheme,
-  CardHeader
 } from '@mui/material';
-
-import Label from '@/components/Label';
-import { CryptoOrder, CryptoOrderStatus } from '@/models/crypto_order';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import BulkActions from './BulkActions';
@@ -37,42 +26,6 @@ interface RecentOrdersTableProps {
   className?: string;
   cryptoOrders: Blog[];
 }
-
-interface Filters {
-  status?: CryptoOrderStatus;
-}
-
-const getStatusLabel = (cryptoOrderStatus: CryptoOrderStatus): JSX.Element => {
-  const map = {
-    failed: {
-      text: 'Failed',
-      color: 'error'
-    },
-    completed: {
-      text: 'Completed',
-      color: 'success'
-    },
-    pending: {
-      text: 'Pending',
-      color: 'warning'
-    }
-  };
-
-  const { text, color }: any = map[cryptoOrderStatus];
-
-  return <Label color={color}>{text}</Label>;
-};
-
-const applyFilters = (
-  cryptoOrders: Blog[],
-  filters: Filters
-): Blog[] => {
-  return cryptoOrders.filter((cryptoOrder) => {
-    let matches = true;
-
-    return matches;
-  });
-};
 
 const applyPagination = (
   cryptoOrders: Blog[],
@@ -89,11 +42,8 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
   const selectedBulkActions = selectedCryptoOrders.length > 0;
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
-  const [filters, setFilters] = useState<Filters>({
-    status: null
-  });
 
-  const [ deleteBlog, { isLoading }] = useDeleteBlogMutation();
+  const [ deleteBlog] = useDeleteBlogMutation();
 
   const handleBlogDelete = (id: string) => {
     deleteBlog({
@@ -139,7 +89,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
     setLimit(parseInt(event.target.value));
   };
 
-  const filteredCryptoOrders = applyFilters(cryptoOrders, filters);
+  const filteredCryptoOrders = null;
   const paginatedCryptoOrders = applyPagination(
     filteredCryptoOrders,
     page,

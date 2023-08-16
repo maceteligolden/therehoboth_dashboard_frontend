@@ -1,6 +1,4 @@
 import { listApi } from "../lib/api";
-import { IRegisterUserInput } from "./dto/auth";
-import IBase from "./dto/base";
 
 const baseUrl: string = "auth";
 

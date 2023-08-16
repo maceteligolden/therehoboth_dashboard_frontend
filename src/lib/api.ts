@@ -26,7 +26,7 @@ export const listApi = createApi({
       return action.payload[reducerPath];
     }
   },
-  endpoints: (builder) => ({
+  endpoints: () => ({
     
   }),
 });
