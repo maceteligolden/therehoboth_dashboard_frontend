@@ -1,10 +1,12 @@
 import { listApi } from "../lib/api";
+import { ILoginResponse, ILogin } from "./dto/auth";
+import { IResponseBase } from "./dto/base";
 
 const baseUrl: string = "auth";
 
 export const authEndpoint = listApi.injectEndpoints({
     endpoints: (build) => ({
-        login: build.mutation({
+        login: build.mutation<IResponseBase<ILoginResponse>, ILogin>({
             query: (body) => ({
                 url: `${baseUrl}/login`,
                 method: "POST",

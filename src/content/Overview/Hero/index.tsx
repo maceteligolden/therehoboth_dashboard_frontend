@@ -1,196 +1,160 @@
 import {
-  Box,
   Button,
+  Card,
   Container,
-  Grid,
-  Typography,
-  styled
+  TextField,
 } from '@mui/material';
-
-import Link from 'src/components/Link';
-
-const TypographyH1 = styled(Typography)(
-  ({ theme }) => `
-    font-size: ${theme.typography.pxToRem(50)};
-`
-);
-
-const TypographyH2 = styled(Typography)(
-  ({ theme }) => `
-    font-size: ${theme.typography.pxToRem(17)};
-`
-);
-
-const LabelWrapper = styled(Box)(
-  ({ theme }) => `
-    background-color: ${theme.colors.success.main};
-    color: ${theme.palette.success.contrastText};
-    font-weight: bold;
-    border-radius: 30px;
-    text-transform: uppercase;
-    display: inline-block;
-    font-size: ${theme.typography.pxToRem(11)};
-    padding: ${theme.spacing(0.5)} ${theme.spacing(1.5)};
-    margin-bottom: ${theme.spacing(2)};
-`
-);
-
-const MuiAvatar = styled(Box)(
-  ({ theme }) => `
-    width: ${theme.spacing(8)};
-    height: ${theme.spacing(8)};
-    border-radius: ${theme.general.borderRadius};
-    background-color: #e5f7ff;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto ${theme.spacing(2)};
-
-    img {
-      width: 60%;
-      height: 60%;
-      display: block;
-    }
-`
-);
-
-const TsAvatar = styled(Box)(
-  ({ theme }) => `
-    width: ${theme.spacing(8)};
-    height: ${theme.spacing(8)};
-    border-radius: ${theme.general.borderRadius};
-    background-color: #dfebf6;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto ${theme.spacing(2)};
-
-    img {
-      width: 60%;
-      height: 60%;
-      display: block;
-    }
-`
-);
-
-const NextJsAvatar = styled(Box)(
-  ({ theme }) => `
-  width: ${theme.spacing(8)};
-  height: ${theme.spacing(8)};
-  border-radius: ${theme.general.borderRadius};
-  background-color: #dfebf6;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto ${theme.spacing(2)};
-
-    img {
-      width: 60%;
-      height: 60%;
-      display: block;
-    }
-`
-);
+import * as yup from 'yup';
+import { useFormik } from 'formik';
+import Toast, { IHandleMotion } from '@/components/Toast';
+import Blog from '@/services/dto/blog';
+import { useState } from 'react';
+import { useLoginMutation } from '@/services/authservice';
+import { ILogin } from '@/services/dto/auth';
+import { useRouter } from 'next/router';
+import { setCredentials } from '@/lib/slice/authslice';
+import { useAppDispatch } from '@/lib/hooks';
 
 function Hero() {
+
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+
+  const [successToastStatus, setSuccessToastStatus] = useState<IHandleMotion>({
+    message: "",
+    visibility: false,
+    status: false,
+  });
+  const [errorToastStatus, setErrorToastStatus] = useState<IHandleMotion>({
+    message: "",
+    visibility: false,
+    status: false,
+  });
+
+  const successToastHandler = (args: IHandleMotion) => {
+    setSuccessToastStatus(args);
+  };
+
+  const errorToastHandler = (args: IHandleMotion) => {
+    setErrorToastStatus(args);
+  };
+
+  const [ login, { isLoading }] = useLoginMutation()
+
+const validationSchema = yup.object({
+  email: yup
+      .string()
+      .required('Title is required'),
+  password: yup
+      .string()
+      .required('Content is required'),
+});
+
+const formik = useFormik({
+  initialValues: {
+      email: '',
+      password: '',
+  },
+  validationSchema: validationSchema,
+  onSubmit: (values: ILogin) => { 
+    login({...values}).then((res: any)=>{
+      if (res.data.status === "success") {
+        successToastHandler({
+          message: res.data.message,
+          visibility: true,
+          status: true,
+        });
+
+        // save logged in user details to redux store and local storage
+        const payload = {
+          user: res.data.data.user,
+          token: res.data.data.token,
+        };
+        dispatch(setCredentials(payload));
+        localStorage.setItem("token", res.data.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data.data.user));
+
+        // goto to dashboard page
+        router.push('/dashboards');
+      } else {
+        errorToastHandler({
+          message: res.data.message,
+          visibility: true,
+          status: false,
+        });
+      }
+    }).catch(()=>{
+      errorToastHandler({
+        message: "server error",
+        visibility: true,
+        status: false,
+      });
+    })
+  },
+});
+
   return (
-    <Container maxWidth="lg" sx={{ textAlign: 'center' }}>
-      <Grid
-        spacing={{ xs: 6, md: 10 }}
-        justifyContent="center"
-        alignItems="center"
-        container
-      >
-        <Grid item md={10} lg={8} mx="auto">
-          <LabelWrapper color="success">Version 1.0.0</LabelWrapper>
-          <TypographyH1 sx={{ mb: 2 }} variant="h1">
-            Tokyo Free White Next.js Typescript Admin Dashboard
-          </TypographyH1>
-          <TypographyH2
-            sx={{ lineHeight: 1.5, pb: 4 }}
-            variant="h4"
-            color="text.secondary"
-            fontWeight="normal"
-          >
-            High performance React template built with lots of powerful
-            Material-UI components across multiple product niches for fast &
-            perfect apps development processes
-          </TypographyH2>
-          <Button
-            component={Link}
-            href="/dashboards/crypto"
-            size="large"
-            variant="contained"
-          >
-            Browse Live Preview
-          </Button>
-          <Button
-            sx={{ ml: 2 }}
-            component="a"
-            target="_blank"
-            rel="noopener"
-            href="https://bloomui.com/product/tokyo-free-black-react-nextjs-material-ui-admin-dashboard"
-            size="large"
-            variant="text"
-          >
-            Key Features
-          </Button>
-          <Grid container spacing={3} mt={5}>
-            <Grid item md={4}>
-              <MuiAvatar>
-                <img
-                  src="/static/images/logo/material-ui.svg"
-                  alt="Material-UI"
-                />
-              </MuiAvatar>
-              <Typography variant="h4">
-                <Box sx={{ pb: 2 }}>
-                  <b>Powered by MUI (Material-UI)</b>
-                </Box>
-                <Typography component="span" variant="subtitle2">
-                  A simple and customizable component library to build faster,
-                  beautiful, and accessible React apps.
-                </Typography>
-              </Typography>
-            </Grid>
-            <Grid item md={4}>
-              <NextJsAvatar>
-                <img src="/static/images/logo/next-js.svg" alt="NextJS" />
-              </NextJsAvatar>
-              <Typography variant="h4">
-                <Box sx={{ pb: 2 }}>
-                  <b>Built with Next.js</b>
-                </Box>
-                <Typography component="span" variant="subtitle2">
-                  Next.js gives you the best developer experience with all the
-                  features you need for production.
-                </Typography>
-              </Typography>
-            </Grid>
-            <Grid item md={4}>
-              <TsAvatar>
-                <img
-                  src="/static/images/logo/typescript.svg"
-                  alt="Typescript"
-                />
-              </TsAvatar>
-              <Typography variant="h4">
-                <Box sx={{ pb: 2 }}>
-                  <b>Built with Typescript</b>
-                </Box>
-                <Typography component="span" variant="subtitle2">
-                  Tokyo Free White features a modern technology stack and is
-                  built with React + Typescript.
-                </Typography>
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid>
+    <Container maxWidth="lg" sx={{ 
+      height: '100%',
+      textAlign: 'center',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      <Card 
+        sx={{ maxWidth: '345px', minWidth: '260px', display: 'flex', flexDirection: 'column', gap: '10px', padding: '20px'}}>
+        <TextField
+          id="outlined-disabled"
+          label="Email"
+          name={'email'}
+          value={formik.values.email}
+          onChange={formik.handleChange}
+          error={formik.touched.email && Boolean(formik.errors.email)}
+          helperText={formik.touched.email && formik.errors.email}
+        />
+        <TextField
+          id="outlined-password-input"
+          label="Password"
+          type="password"
+          name={'password'}
+          value={formik.values.password}
+          onChange={formik.handleChange}
+          error={formik.touched.password && Boolean(formik.errors.password)}
+          helperText={formik.touched.password && formik.errors.password}
+        />
+        <Button
+          sx={{ mt: { xs: 2, md: 0 } }}
+          variant="contained"
+          onClick={() => formik.handleSubmit()}
+        >
+          Login
+        </Button>
+      </Card>
+
+      <Toast
+          message={successToastStatus.message}
+          severity={"success"}
+          status={successToastStatus.visibility}
+          handler={function (): void {
+              setSuccessToastStatus({
+              visibility: false,
+              });
+          }}
+      />
+
+      <Toast
+          message={errorToastStatus.message}
+          severity={"error"}
+          status={errorToastStatus.visibility}
+          handler={function (): void {
+              setErrorToastStatus({
+              visibility: false,
+              });
+          }}
+      />
     </Container>
+    
   );
 }
 

@@ -3,17 +3,17 @@ import { getFromLocalStorage } from "../../utils/localstorage";
 import { RootState } from "../store";
 
 export interface User {
-  username: string,
+  firstname: string,
   id: string,
   email: string,
-  role: string
+  lastname: string
 }
 
 const defaultUser: User = {
-  username: '',
+  firstname: '',
   id: '',
   email: '',
-  role: ''
+  lastname: ''
 }
 
 interface AuthState {
